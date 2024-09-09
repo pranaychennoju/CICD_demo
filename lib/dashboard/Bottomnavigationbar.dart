@@ -1,9 +1,6 @@
 import 'package:elearning_app/dashboard/dashboard_screen.dart';
 import 'package:elearning_app/dashboard/mylearnings_screen.dart';
 import 'package:elearning_app/dashboard/profile_screen.dart';
-import 'package:elearning_app/landing_page.dart';
-import 'package:elearning_app/login_screen.dart';
-import 'package:elearning_app/signup_screen.dart';
 import 'package:flutter/material.dart';
 
 class BottomNavigationBarWidget extends StatefulWidget {
@@ -17,19 +14,19 @@ class BottomNavigationBarWidget extends StatefulWidget {
 class _BottomNavigationBarWidgetState extends State<BottomNavigationBarWidget> {
   int myIndex = 0;
   List<Widget> WidgetList = [
-    DashboardScreen(),
-    MylearningsScreen(),
-    ProfileScreen()
+    const DashboardScreen(),
+    const MylearningsScreen(),
+    const ProfileScreen()
   ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('E learning App'),
+        title: const Text('E learning App'),
         centerTitle: true,
       ),
       bottomNavigationBar: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color.fromARGB(255, 12, 1, 82), Colors.blue],
             begin: Alignment.topRight,
@@ -50,7 +47,7 @@ class _BottomNavigationBarWidgetState extends State<BottomNavigationBarWidget> {
               });
             },
             currentIndex: myIndex,
-            items: [
+            items: const [
               BottomNavigationBarItem(
                   icon: Icon(Icons.home), label: "Dashboard"),
               BottomNavigationBarItem(
