@@ -9,7 +9,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+    env:
+      APK_PATH: build/app/outputs/flutter-apk/app-release.apk
+      AAB_PATH: build/app/outputs/bundle/release/app-release.aab
+
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
@@ -22,15 +25,9 @@ jobs:
       - run: flutter pub get
       
       - run: flutter build apk
-        # Save APK path to an environment variable for later use
-        env:
-          APK_PATH: build/app/outputs/flutter-apk/app-release.apk
-
-      - run: flutter build appbundle
-        # Save AAB path to an environment variable for later use
-        env:
-          AAB_PATH: build/app/outputs/bundle/release/app-release.aab
       
+      - run: flutter build appbundle
+
       # Upload APK as an artifact
       - name: Upload APK
         uses: actions/upload-artifact@v3
