@@ -42,15 +42,14 @@ jobs:
           name: app-release-aab
           path: ${{ env.AAB_PATH }}
 
-      # Create a tag
+      # Create a Git Tag
       - name: Create Git Tag
-        id: tag
         run: |
           echo "Creating Git tag"
           git tag v1.0.0
           git push origin v1.0.0
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       # Create a GitHub release and upload the APK and AAB files
       - name: Create Release and Upload Files
@@ -60,4 +59,4 @@ jobs:
             ${{ env.APK_PATH }}
             ${{ env.AAB_PATH }}
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
