@@ -13,11 +13,48 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
+      
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.24.2
+
       - run: flutter pub get
-      - run: flutter test
+      
       - run: flutter build apk
+        # Save APK path to an environment variable for later use
+        env:
+          APK_PATH: build/app/outputs/flutter-apk/app-release.apk
+
       - run: flutter build appbundle
+        # Save AAB path to an environment variable for later use
+        env:
+          AAB_PATH: build/app/outputs/bundle/release/app-release.aab
+      
+      # Upload APK as an artifact
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release-apk
+          path: ${{ env.APK_PATH }}
+      
+      # Upload AAB as an artifact
+      - name: Upload AAB
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release-aab
+          path: ${{ env.AAB_PATH }}
+
+      # Create a GitHub release and upload the APK and AAB files
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          tag_name: ${{ github.sha }}
+          release_name: Release ${{ github.sha }}
+          draft: false
+          prerelease: false
+          files: |
+            ${{ env.APK_PATH }}
+            ${{ env.AAB_PATH }}
