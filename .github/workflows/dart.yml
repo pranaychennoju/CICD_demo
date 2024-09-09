@@ -42,16 +42,18 @@ jobs:
           name: app-release-aab
           path: ${{ env.AAB_PATH }}
 
+      # Create a tag (e.g., v1.0.0)
+      - name: Create Git Tag
+        run: |
+          git tag v1.0.0
+          git push origin v1.0.0
+
       # Create a GitHub release and upload the APK and AAB files
-      - name: Create Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+      - name: Create Release and Upload Files
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.sha }}
-          release_name: Release ${{ github.sha }}
-          draft: false
-          prerelease: false
           files: |
             ${{ env.APK_PATH }}
             ${{ env.AAB_PATH }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
