@@ -29,34 +29,34 @@ jobs:
       - run: flutter build appbundle
 
       # Upload APK as an artifact
-      - name: Upload APK
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-release-apk
-          path: ${{ env.APK_PATH }}
+      # - name: Upload APK
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: app-release-apk
+      #     path: ${{ env.APK_PATH }}
       
-      # Upload AAB as an artifact
-      - name: Upload AAB
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-release-aab
-          path: ${{ env.AAB_PATH }}
+      # # Upload AAB as an artifact
+      # - name: Upload AAB
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: app-release-aab
+      #     path: ${{ env.AAB_PATH }}
 
-      # Create a Git Tag
-      - name: Create Git Tag
-        run: |
-          echo "Creating Git tag"
-          git tag v1.0.0
-          git push origin v1.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+      # # Create a Git Tag
+      # - name: Create Git Tag
+      #   run: |
+      #     echo "Creating Git tag"
+      #     git tag v1.0.0
+      #     git push origin v1.0.0
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
-      # Create a GitHub release and upload the APK and AAB files
-      - name: Create Release and Upload Files
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ${{ env.APK_PATH }}
-            ${{ env.AAB_PATH }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+      # # Create a GitHub release and upload the APK and AAB files
+      # - name: Create Release and Upload Files
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     files: |
+      #       ${{ env.APK_PATH }}
+      #       ${{ env.AAB_PATH }}
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
