@@ -37,4 +37,5 @@ jobs:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}  # Set Firebase token in GitHub secrets
         run: |
           npm install -g firebase-tools
+          cd web  # Navigate to the directory containing firebase.json if needed
           firebase deploy --only hosting
