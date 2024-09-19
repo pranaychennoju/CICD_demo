@@ -1,0 +1,38 @@
+name: Flutter Web CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Flutter environment
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.2"  # Specify the Flutter version to use
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Step 4: Build Flutter web
+      - name: Build Flutter Web
+        run: flutter build web
+
+      # Step 5: Deploy to Firebase Hosting
+      - name: Deploy to Firebase Hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}  # Set Firebase token in GitHub secrets
+        run: |
+          npm install -g firebase-tools
+          firebase deploy --only hosting
