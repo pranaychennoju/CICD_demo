@@ -21,10 +21,14 @@ jobs:
       - name: Notify Slack (Build Started)
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: |
-          curl -X POST -H 'Content-type: application/json' --data \
-          '{"text": "Build started for branch: ${{ github.ref }}"}' \
-          $SLACK_WEBHOOK_URL
+          SLACK_TITLE: Started - Web Build
+          SLACK_MESSAGE: 'Web Build Started'
+          SLACK_USERNAME: CI/CD
+          SLACK_COLOR: ${{ job.status }}
+        # run: |
+        #   curl -X POST -H 'Content-type: application/json' --data \
+        #   '{"text": "Build started for branch: ${{ github.ref }}"}' \
+        #   $SLACK_WEBHOOK_URL
 
       # Step 3: Set up Flutter environment
       - name: Set up Flutter
