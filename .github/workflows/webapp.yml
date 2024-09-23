@@ -17,25 +17,53 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up Flutter environment
+      # Step 2: Send Slack notification for build start
+      - name: Notify Slack (Build Started)
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data \
+          '{"text": "Build started for branch: ${{ github.ref }}"}' \
+          $SLACK_WEBHOOK_URL
+
+      # Step 3: Set up Flutter environment
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.24.2"  # Specify the Flutter version to use
 
-      # Step 3: Install dependencies
+      # Step 4: Install dependencies
       - name: Install dependencies
         run: flutter pub get
 
-      # Step 4: Build Flutter web
+      # Step 5: Build Flutter web
       - name: Build Flutter Web
         run: flutter build web
 
-      # Step 5: Deploy to Firebase Hosting
+      # Step 6: Deploy to Firebase Hosting
       - name: Deploy to Firebase Hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}  # Set Firebase token in GitHub secrets
         run: |
           npm install -g firebase-tools
-          cd web  # Navigate to the directory containing firebase.json if needed
           firebase deploy --only hosting
+
+      # Step 7: Send Slack notification for build success
+      - name: Notify Slack (Build Success)
+        if: success()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data \
+          '{"text": "Build succeeded for branch: ${{ github.ref }}"}' \
+          $SLACK_WEBHOOK_URL
+
+      # Step 8: Send Slack notification for build failure
+      - name: Notify Slack (Build Failed)
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data \
+          '{"text": "Build failed for branch: ${{ github.ref }}"}' \
+          $SLACK_WEBHOOK_URL
