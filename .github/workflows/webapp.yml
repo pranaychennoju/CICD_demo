@@ -17,18 +17,48 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Send Slack notification for build start
+      # Step 2: Notify Slack (Build Started)
       - name: Notify Slack (Build Started)
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_TITLE: Started - Web Build
-          SLACK_MESSAGE: 'Web Build Started'
-          SLACK_USERNAME: CI/CD
-          SLACK_COLOR: ${{ job.status }}
-        # run: |
-        #   curl -X POST -H 'Content-type: application/json' --data \
-        #   '{"text": "Build started for branch: ${{ github.ref }}"}' \
-        #   $SLACK_WEBHOOK_URL
+          SLACK_TITLE: "Started - Web Build"
+          SLACK_MESSAGE: "Web Build Started"
+          SLACK_USERNAME: "CI/CD"
+          SLACK_COLOR: "#36a64f"  # Green color for started
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data \
+          '{
+            "username": "'"${SLACK_USERNAME}"'",
+            "attachments": [
+              {
+                "color": "'"${SLACK_COLOR}"'",
+                "title": "'"${SLACK_TITLE}"'",
+                "text": "'"${SLACK_MESSAGE}"'",
+                "fields": [
+                  {
+                    "title": "Repository",
+                    "value": "'"${{ github.repository }}"'",
+                    "short": true
+                  },
+                  {
+                    "title": "Branch",
+                    "value": "'"${{ github.ref }}"'",
+                    "short": true
+                  },
+                  {
+                    "title": "Workflow",
+                    "value": "'"${{ github.workflow }}"'",
+                    "short": true
+                  },
+                  {
+                    "title": "Job Status",
+                    "value": "Started"
+                  }
+                ]
+              }
+            ]
+          }' \
+          $SLACK_WEBHOOK_URL
 
       # Step 3: Set up Flutter environment
       - name: Set up Flutter
@@ -52,22 +82,90 @@ jobs:
           npm install -g firebase-tools
           firebase deploy --only hosting
 
-      # Step 7: Send Slack notification for build success
+      # Step 7: Notify Slack (Build Success)
       - name: Notify Slack (Build Success)
         if: success()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_TITLE: "Success - Web Build"
+          SLACK_MESSAGE: "Web Build Succeeded"
+          SLACK_USERNAME: "CI/CD"
+          SLACK_COLOR: "#2eb886"  # Green color for success
         run: |
           curl -X POST -H 'Content-type: application/json' --data \
-          '{"text": "Build succeeded for branch: ${{ github.ref }}"}' \
+          '{
+            "username": "'"${SLACK_USERNAME}"'",
+            "attachments": [
+              {
+                "color": "'"${SLACK_COLOR}"'",
+                "title": "'"${SLACK_TITLE}"'",
+                "text": "'"${SLACK_MESSAGE}"'",
+                "fields": [
+                  {
+                    "title": "Repository",
+                    "value": "'"${{ github.repository }}"'",
+                    "short": true
+                  },
+                  {
+                    "title": "Branch",
+                    "value": "'"${{ github.ref }}"'",
+                    "short": true
+                  },
+                  {
+                    "title": "Workflow",
+                    "value": "'"${{ github.workflow }}"'",
+                    "short": true
+                  },
+                  {
+                    "title": "Job Status",
+                    "value": "Succeeded"
+                  }
+                ]
+              }
+            ]
+          }' \
           $SLACK_WEBHOOK_URL
 
-      # Step 8: Send Slack notification for build failure
+      # Step 8: Notify Slack (Build Failed)
       - name: Notify Slack (Build Failed)
         if: failure()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_TITLE: "Failed - Web Build"
+          SLACK_MESSAGE: "Web Build Failed"
+          SLACK_USERNAME: "CI/CD"
+          SLACK_COLOR: "#ff0000"  # Red color for failure
         run: |
           curl -X POST -H 'Content-type: application/json' --data \
-          '{"text": "Build failed for branch: ${{ github.ref }}"}' \
+          '{
+            "username": "'"${SLACK_USERNAME}"'",
+            "attachments": [
+              {
+                "color": "'"${SLACK_COLOR}"'",
+                "title": "'"${SLACK_TITLE}"'",
+                "text": "'"${SLACK_MESSAGE}"'",
+                "fields": [
+                  {
+                    "title": "Repository",
+                    "value": "'"${{ github.repository }}"'",
+                    "short": true
+                  },
+                  {
+                    "title": "Branch",
+                    "value": "'"${{ github.ref }}"'",
+                    "short": true
+                  },
+                  {
+                    "title": "Workflow",
+                    "value": "'"${{ github.workflow }}"'",
+                    "short": true
+                  },
+                  {
+                    "title": "Job Status",
+                    "value": "Failed"
+                  }
+                ]
+              }
+            ]
+          }' \
           $SLACK_WEBHOOK_URL
