@@ -1,187 +1,162 @@
+import 'package:elearning_app/otp_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class SignupScreen extends StatelessWidget {
+class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
+
+  @override
+  State<SignupScreen> createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen> {
+  final _phoneController = TextEditingController();
+  final _auth = FirebaseAuth.instance;
+  bool _isLoading = false;
+
+  void _sendOtp() async {
+    final phoneNumber = _phoneController.text.trim();
+
+    // Input Validation (Improved)
+    if (phoneNumber.isEmpty) {
+      _showSnackBar("Phone number is required");
+      return;
+    }
+
+    if (phoneNumber.length != 10) {
+      _showSnackBar("Phone number must be 10 digits");
+      return;
+    }
+
+    if (!RegExp(r'^[0-9]+$').hasMatch(phoneNumber)) {
+      _showSnackBar("Invalid phone number format");
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _auth.verifyPhoneNumber(
+        phoneNumber: '+91$phoneNumber', // Always include country code
+        verificationCompleted: (PhoneAuthCredential credential) {
+          setState(() {
+            _isLoading = false;
+          });
+          // Auto-retrieval (Handle if needed, but often not reliable)
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          setState(() {
+            _isLoading = false;
+          });
+          _showSnackBar("Verification failed: ${e.message}");
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          setState(() {
+            _isLoading = false;
+          });
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OtpScreen(
+                verificationId: verificationId,
+                phoneNumber: phoneNumber,
+              ),
+            ),
+          );
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          setState(() {
+            _isLoading = false;
+          });
+          _showSnackBar(
+              "Auto retrieval timeout. Please enter the code manually."); // User feedback
+        },
+      );
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showSnackBar("Error: ${e.toString()}");
+    }
+  }
+
+  // Helper function for SnackBars
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Hi!",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 30,
-                            letterSpacing: 4),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Text(
-                        "Create a new account",
-                        style: TextStyle(
-                            color: Colors.grey[400],
-                            fontWeight: FontWeight.w900,
-                            fontSize: 22),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 60,
-                ),
-                Container(
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        decoration:
-                            const InputDecoration(labelText: 'Username'),
-                      ),
-                      const SizedBox(
-                        height: 25,
-                      ),
-                      TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Email',
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 25,
-                      ),
-                      TextFormField(
-                        decoration: const InputDecoration(
-                            labelText: 'Password',
-                            suffixIcon: Icon(Icons.visibility_off_rounded)),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Container(
-                  child: Column(
-                    children: [
-                      Center(
-                        child: Column(
-                          children: [
-                            Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 50),
-                              height: 44.0,
-                              decoration: const BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5)),
-                                  gradient: LinearGradient(colors: [
-                                    Color.fromARGB(255, 12, 1, 82),
-                                    Colors.blue
-                                  ])),
-                              child: ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    shadowColor: Colors.transparent),
-                                child: const Text(
-                                  'SIGNUP',
-                                  style: TextStyle(
-                                      color: Colors.white, letterSpacing: 2),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Divider(),
+      appBar: AppBar(),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
+        child: SingleChildScrollView(
+          // Important for keyboard avoiding
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 60),
+              Column(
+                children: [
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: TextFormField(
+                      controller: _phoneController,
+                      keyboardType: TextInputType.phone,
+                      decoration: const InputDecoration(
+                        labelText: 'Enter your Phone Number to Receive OTP',
+                        border: OutlineInputBorder(),
+                        prefixText: '+91 ', // Show country code prefix
                       ),
                     ),
-                    Text(
-                      "OR",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    Expanded(
-                        child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Divider(),
-                    ))
-                  ],
-                ),
-                Container(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Text(
-                          "Social Media Signup",
-                          style: TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assects/images/google.png',
-                              // height: 50,
-                            ),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Image.asset(
-                              'assects/images/fb.png',
-                              // height: 50,
-                            )
-                          ],
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text('Already have an account?'),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            TextButton(
-                                onPressed: null,
-                                child: Text(
-                                  'Sign in',
-                                  style: TextStyle(color: Colors.blue[900]),
-                                ))
-                          ],
-                        )
-                      ],
-                    ),
                   ),
-                )
-              ],
-            ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Center(
+                child: SizedBox(
+                  // Use SizedBox to constrain button size
+                  height: 44.0,
+                  width: double.infinity, // or a specific width
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _sendOtp,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(
+                          255, 12, 1, 82), // Set background color directly
+                      foregroundColor: Colors.white, // Set text color
+                      shape: RoundedRectangleBorder(
+                        // Set button shape
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                    ),
+                    child: _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            'SEND OTP',
+                            style: TextStyle(
+                              letterSpacing: 2,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    super.dispose();
   }
 }

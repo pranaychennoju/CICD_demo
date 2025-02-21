@@ -14,21 +14,32 @@ class BottomNavigationBarWidget extends StatefulWidget {
 class _BottomNavigationBarWidgetState extends State<BottomNavigationBarWidget> {
   int myIndex = 0;
   List<Widget> WidgetList = [
-    const DashboardScreen(),
+    HomeScreen(),
     const MylearningsScreen(),
     const ProfileScreen()
   ];
+
+  // Define the gradient colors for reuse
+  final Color appBarColor = const Color.fromARGB(255, 66, 51, 160);
+  final Color bottomNavEndColor = Colors.blue;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('E learning App'),
+        automaticallyImplyLeading: false,
+        title: Image.asset(
+          'assects/images/Hackethos4u.jpg',
+          width: 50,
+        ),
+
         centerTitle: true,
+        backgroundColor: appBarColor, // Match the AppBar color
       ),
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color.fromARGB(255, 12, 1, 82), Colors.blue],
+            colors: [appBarColor, bottomNavEndColor],
             begin: Alignment.topRight,
             end: Alignment.topLeft,
             stops: [0.0, 0.8],
@@ -40,7 +51,6 @@ class _BottomNavigationBarWidgetState extends State<BottomNavigationBarWidget> {
             selectedItemColor: Colors.white,
             backgroundColor: Colors.transparent,
             showUnselectedLabels: false,
-            // type: BottomNavigationBarType.,
             onTap: (index) {
               setState(() {
                 myIndex = index;
@@ -48,10 +58,9 @@ class _BottomNavigationBarWidgetState extends State<BottomNavigationBarWidget> {
             },
             currentIndex: myIndex,
             items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.home), label: "Dashboard"),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.local_library), label: "My Learnings"),
+                  icon: Icon(Icons.local_library), label: "My Purchases"),
               BottomNavigationBarItem(
                   icon: Icon(Icons.person), label: "Profile"),
             ]),
