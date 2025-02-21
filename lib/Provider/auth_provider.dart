@@ -10,9 +10,13 @@ class AuthProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   String? _verificationId; // Store verification ID
+  String? _phoneNumber; // Store the phone number
+
+  String? get phoneNumber => _phoneNumber; // Getter for phone number
 
   Future<void> verifyPhoneNumber(
       String phoneNumber, BuildContext context) async {
+    _phoneNumber = phoneNumber; // Store the phone number
     _isLoading = true;
     notifyListeners();
 
@@ -33,8 +37,7 @@ class AuthProvider with ChangeNotifier {
             });
           }
 
-          Navigator.pushReplacementNamed(
-              context, '/confirm_signup'); // Navigate to confirm signup
+          Navigator.pushReplacementNamed(context, '/confirm_signup');
         },
         verificationFailed: (FirebaseAuthException e) {
           _isLoading = false;
@@ -75,10 +78,7 @@ class AuthProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
 
-      // No need to save to Firestore here, it's done in verificationCompleted
-
-      Navigator.pushReplacementNamed(
-          context, '/confirm_signup'); // Navigate to confirm signup
+      Navigator.pushReplacementNamed(context, '/confirm_signup');
     } catch (e) {
       _isLoading = false;
       notifyListeners();
@@ -102,7 +102,7 @@ class AuthProvider with ChangeNotifier {
 
       _isLoading = false;
       notifyListeners();
-      Navigator.pushReplacementNamed(context, '/home'); // Navigate to home
+      Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       _isLoading = false;
       notifyListeners();

@@ -87,7 +87,7 @@ class LoginScreen extends StatelessWidget {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              BottomNavigationBarWidget(),
+                                              DashboardScreen(),
                                         ));
                                   },
                                   style: ElevatedButton.styleFrom(

@@ -1,73 +1,96 @@
-import 'package:elearning_app/dashboard/dashboard_screen.dart';
+import 'package:elearning_app/Provider/navigation_provider.dart';
+import 'package:elearning_app/Provider/profile_provider.dart';
+import 'package:elearning_app/dashboard/courses_screen.dart';
+import 'package:elearning_app/dashboard/home_screen.dart';
 import 'package:elearning_app/dashboard/mylearnings_screen.dart';
 import 'package:elearning_app/dashboard/profile_screen.dart';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class BottomNavigationBarWidget extends StatefulWidget {
-  const BottomNavigationBarWidget({super.key});
-
-  @override
-  State<BottomNavigationBarWidget> createState() =>
-      _BottomNavigationBarWidgetState();
-}
-
-class _BottomNavigationBarWidgetState extends State<BottomNavigationBarWidget> {
-  int myIndex = 0;
-  List<Widget> WidgetList = [
-    HomeScreen(),
-    const MylearningsScreen(),
-    const ProfileScreen()
-  ];
-
-  // Define the gradient colors for reuse
-  final Color appBarColor = const Color.fromARGB(255, 66, 51, 160);
-  final Color bottomNavEndColor = Colors.blue;
-
+class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Image.asset(
-          'assects/images/Hackethos4u.jpg',
-          width: 50,
-        ),
+    return _DashboardScreenContent();
+  }
+}
 
-        centerTitle: true,
-        backgroundColor: appBarColor, // Match the AppBar color
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [appBarColor, bottomNavEndColor],
-            begin: Alignment.topRight,
-            end: Alignment.topLeft,
-            stops: [0.0, 0.8],
-            tileMode: TileMode.clamp,
+class _DashboardScreenContent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<NavigationProvider>(
+      builder: (context, navigationProvider, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Dashboard'),
+            backgroundColor: Colors.orange,
+            automaticallyImplyLeading: false,
+            actions:
+                _buildAppBarActions(context, navigationProvider.selectedIndex),
           ),
-        ),
-        child: BottomNavigationBar(
-            unselectedItemColor: Colors.blueGrey,
-            selectedItemColor: Colors.white,
-            backgroundColor: Colors.transparent,
-            showUnselectedLabels: false,
+          body: _buildBody(navigationProvider.selectedIndex),
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: navigationProvider.selectedIndex,
             onTap: (index) {
-              setState(() {
-                myIndex = index;
-              });
+              navigationProvider.setSelectedIndex(index);
             },
-            currentIndex: myIndex,
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+            backgroundColor: const Color(0xFF1A237E), // Thick blue
+            selectedItemColor: Colors.orange,
+            unselectedItemColor: Colors.grey,
+            items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
-                  icon: Icon(Icons.local_library), label: "My Purchases"),
+                icon: Icon(Icons.home),
+                label: 'Home',
+              ),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.person), label: "Profile"),
-            ]),
-      ),
-      body: Center(
-        child: WidgetList[myIndex],
-      ),
+                icon: Icon(Icons.book),
+                label: 'Courses',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.my_library_books),
+                label: 'My Courses',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                label: 'Profile',
+              ),
+            ],
+          ),
+        );
+      },
     );
+  }
+
+  List<Widget> _buildAppBarActions(BuildContext context, int index) {
+    if (index == 3) {
+      // Profile screen index
+      return [
+        Consumer<ProfileProvider>(builder: (context, profileProvider, child) {
+          return IconButton(
+            icon: Icon(profileProvider.isEditing ? Icons.save : Icons.edit),
+            onPressed: () {
+              profileProvider.toggleEditing();
+            },
+          );
+        }),
+      ];
+    } else {
+      return []; // Empty list for other screens
+    }
+  }
+
+  Widget _buildBody(int index) {
+    switch (index) {
+      case 0:
+        return HomeScreen(); // Replace with your Home widget
+      case 1:
+        return CoursesScreen(); // Replace with your Courses widget
+      case 2:
+        return MylearningsScreen(); // Replace with your My Courses widget
+      case 3:
+        return ProfileScreen(); // Replace with your Profile widget
+      default:
+        return const Center(child: Text('Unknown Content'));
+    }
   }
 }
