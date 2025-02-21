@@ -1,5 +1,5 @@
-import 'package:elearning_app/login_screen.dart';
-import 'package:elearning_app/signup_screen.dart';
+import 'package:elearning_app/screens/login_screen.dart';
+import 'package:elearning_app/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 
 class LandingPage extends StatelessWidget {
