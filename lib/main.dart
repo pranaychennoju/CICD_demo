@@ -6,10 +6,10 @@ import 'package:elearning_app/dashboard/Bottomnavigationbar.dart';
 import 'package:elearning_app/dashboard/courses_screen.dart';
 import 'package:elearning_app/dashboard/mylearnings_screen.dart';
 import 'package:elearning_app/dashboard/profile_screen.dart';
-import 'package:elearning_app/login_screen.dart';
-import 'package:elearning_app/otp_screen.dart';
+import 'package:elearning_app/screens/login_screen.dart';
+import 'package:elearning_app/screens/otp_screen.dart';
 
-import 'package:elearning_app/signup_screen.dart';
+import 'package:elearning_app/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         initialRoute:
-            '/signup', // Or '/home' if you want to skip signup for testing
+            '/home', // Or '/home' if you want to skip signup for testing
         routes: {
           '/signup': (context) => const SignupScreen(),
           '/otp': (context) => OtpScreen(),
